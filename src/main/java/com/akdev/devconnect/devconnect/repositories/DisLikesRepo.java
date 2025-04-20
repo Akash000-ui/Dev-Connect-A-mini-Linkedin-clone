@@ -7,4 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DisLikesRepo extends JpaRepository<DisLikes, Long> {
 
+    default Long countDisLikesByPostId(long postId){
+        return findAll().stream()
+                .filter(disLikes -> disLikes.getPost_dislike().getId() == postId)
+                .count();
+    }
 }

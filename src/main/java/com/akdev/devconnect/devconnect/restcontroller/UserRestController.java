@@ -2,6 +2,7 @@ package com.akdev.devconnect.devconnect.restcontroller;
 
 
 import com.akdev.devconnect.devconnect.dto.LoginRequest;
+import com.akdev.devconnect.devconnect.dto.PostWithCommentsDisLikesAndLikesDTO;
 import com.akdev.devconnect.devconnect.model.UsersModel;
 import com.akdev.devconnect.devconnect.services.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,6 +47,11 @@ public class UserRestController {
         response.put("timestamp", LocalDateTime.now());
 
         return new ResponseEntity<>(response , HttpStatus.OK);
+    }
+
+    @RequestMapping("/posts")
+    public List<PostWithCommentsDisLikesAndLikesDTO> getPosts() {
+        return userService.getPosts();
     }
 
 

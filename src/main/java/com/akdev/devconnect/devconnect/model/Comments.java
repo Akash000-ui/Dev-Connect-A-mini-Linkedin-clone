@@ -11,7 +11,7 @@ public class Comments {
     private Long id;
 
     private String content;
-    private String authorName;
+    private String  authorName;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UsersModel comment_user;
