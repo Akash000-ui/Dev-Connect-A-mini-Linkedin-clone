@@ -34,7 +34,7 @@ public class Likes {
         this.user_like = user_like;
     }
 
-    public Posts getPost_like() {
+    public Posts  getPost_like() {
         return post_like;
     }
 
