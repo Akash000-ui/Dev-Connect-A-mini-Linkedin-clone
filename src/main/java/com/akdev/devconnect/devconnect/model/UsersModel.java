@@ -17,7 +17,7 @@ public class UsersModel {
         @Column(nullable = false, unique = true)
         private String email;
 
-        @Column(nullable = false)
+        @Column(nullable = true)
         private String password;
 
         private String profileImageUrl;

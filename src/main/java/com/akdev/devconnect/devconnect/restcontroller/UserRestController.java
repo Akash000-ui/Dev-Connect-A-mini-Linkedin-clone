@@ -2,6 +2,7 @@ package com.akdev.devconnect.devconnect.restcontroller;
 
 
 import com.akdev.devconnect.devconnect.dto.LoginRequest;
+import com.akdev.devconnect.devconnect.dto.OAuthRegisterDTO;
 import com.akdev.devconnect.devconnect.dto.PostWithCommentsDisLikesAndLikesDTO;
 import com.akdev.devconnect.devconnect.model.UsersModel;
 import com.akdev.devconnect.devconnect.services.UserService;
@@ -52,6 +53,18 @@ public class UserRestController {
     @RequestMapping("/posts")
     public List<PostWithCommentsDisLikesAndLikesDTO> getPosts() {
         return userService.getPosts();
+    }
+
+    @RequestMapping("/register/google")
+    public ResponseEntity<Object> registerUserWithGoogle(@RequestBody OAuthRegisterDTO oAuthRegisterDTO){
+
+        userService.registerUserWithGoogle(oAuthRegisterDTO);
+
+        Map<String , Object> response = new HashMap<>();
+        response.put( "status" , HttpStatus.CREATED.value());
+        response.put("message", "User registered successfully");
+        response.put("timestamp", LocalDateTime.now());
+        return new ResponseEntity<>(response , HttpStatus.CREATED);
     }
 
 
