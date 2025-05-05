@@ -1,14 +1,14 @@
 package com.akdev.devconnect.devconnect.dto;
 
-public class LikesDTO {
+public class LikesAndDislikesDTO {
 
     private Long user_like_id;
     private Long post_like_id;
 
-    public LikesDTO() {
+    public LikesAndDislikesDTO() {
     }
 
-    public LikesDTO( Long user_like_id, Long post_like_id) {
+    public LikesAndDislikesDTO(Long user_like_id, Long post_like_id) {
         this.user_like_id = user_like_id;
         this.post_like_id = post_like_id;
     }

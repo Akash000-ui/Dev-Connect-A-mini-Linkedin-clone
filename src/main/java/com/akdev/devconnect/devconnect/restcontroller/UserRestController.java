@@ -6,6 +6,8 @@ import com.akdev.devconnect.devconnect.dto.OAuthRegisterDTO;
 import com.akdev.devconnect.devconnect.dto.PostWithCommentsDisLikesAndLikesDTO;
 import com.akdev.devconnect.devconnect.model.UsersModel;
 import com.akdev.devconnect.devconnect.services.UserService;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,32 +30,23 @@ public class UserRestController {
 
     @RequestMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody UsersModel user) {
-        userService.addUser(user);
-
-        Map<String , Object> response = new HashMap<>();
-        response.put( "status" , HttpStatus.CREATED.value());
-        response.put("message", "User registered successfully");
-        response.put("timestamp", LocalDateTime.now());
-
-        return new ResponseEntity<>(response , HttpStatus.CREATED);
+        return userService.addUser(user);
     }
 
     @RequestMapping("/login")
-    public ResponseEntity<Object> loginUser(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    public ResponseEntity<Object> loginUser(@RequestBody LoginRequest loginRequest) {
 
-        userService.isValid(loginRequest , session);
-        Map<String , Object> response = new HashMap<>();
-        response.put( "status" , HttpStatus.OK.value());
-        response.put("message", "User logged in successfully");
-        response.put("timestamp", LocalDateTime.now());
+        return userService.isValid(loginRequest);
 
-        return new ResponseEntity<>(response , HttpStatus.OK);
+
     }
 
     @RequestMapping("/posts")
-    public List<PostWithCommentsDisLikesAndLikesDTO> getPosts() {
-        return userService.getPosts();
+    public List<PostWithCommentsDisLikesAndLikesDTO> getPosts(HttpServletRequest request) {
+        Claims claims = (Claims) request.getAttribute("claims");
+        return userService.getPosts(claims);
     }
+
 
     @RequestMapping("/register/google")
     public ResponseEntity<Object> registerUserWithGoogle(@RequestBody OAuthRegisterDTO oAuthRegisterDTO){
@@ -65,6 +58,12 @@ public class UserRestController {
         response.put("message", "User registered successfully");
         response.put("timestamp", LocalDateTime.now());
         return new ResponseEntity<>(response , HttpStatus.CREATED);
+    }
+
+    @RequestMapping("/login/google")
+    public ResponseEntity<Object> loginUserWithGoogle(@RequestBody Map<String , String> token) {
+
+        return userService.verifyGoogleUser(token);
     }
 
 

@@ -10,9 +10,12 @@ import java.util.List;
 
 @Repository
 public interface UserRepo extends JpaRepository<UsersModel, Long> {
+
+
     List<UsersModel> findByNameContainingIgnoreCase(String searchTerm);
     @Query("SELECT u FROM UsersModel u JOIN u.skills s WHERE LOWER(s) LIKE LOWER(CONCAT('%', :st, '%'))")
     List<UsersModel> searchBySkillIgnoreCase(@Param("st") String st);
 
+    UsersModel findByEmail(String email);
 }
 

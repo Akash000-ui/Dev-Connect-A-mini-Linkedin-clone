@@ -126,4 +126,8 @@ public class UsersModel {
     public void setSkills(List<String> skills) {
         this.skills = skills;
     }
+
+    public void toString(String name) {
+        this.name = name;
+    }
 }

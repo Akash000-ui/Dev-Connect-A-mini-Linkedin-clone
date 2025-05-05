@@ -1,5 +1,6 @@
 package com.akdev.devconnect.devconnect.services;
 
+import com.akdev.devconnect.devconnect.dto.PostWithCommentsDisLikesAndLikesDTO;
 import com.akdev.devconnect.devconnect.dto.SearchFilteredResultDTO;
 import com.akdev.devconnect.devconnect.model.UsersModel;
 import com.akdev.devconnect.devconnect.repositories.UserRepo;
@@ -27,4 +28,7 @@ public class FilterUsersService {
                 .map(user -> new SearchFilteredResultDTO(user.getId(), user.getName(), user.getBio(),user.getProfileImageUrl()))
                 .toList();
     }
+
+//    public List<PostWithCommentsDisLikesAndLikesDTO> getPostsFilteredResult(String term) {
+//    }
 }

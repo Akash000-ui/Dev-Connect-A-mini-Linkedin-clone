@@ -1,5 +1,6 @@
 package com.akdev.devconnect.devconnect.restcontroller;
 
+import com.akdev.devconnect.devconnect.dto.PostWithCommentsDisLikesAndLikesDTO;
 import com.akdev.devconnect.devconnect.dto.SearchFilteredResultDTO;
 import com.akdev.devconnect.devconnect.services.FilterUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,17 @@ public class SearchFilterRestController {
     private FilterUsersService filterUsersService;
 
     @GetMapping("/filterByName")
-    public List<SearchFilteredResultDTO> getFilteredResults(@RequestParam String searchTerm) {
-        return filterUsersService.getFilteredResults(searchTerm);
+    public List<SearchFilteredResultDTO> getFilteredResults(@RequestParam String term) {
+        return filterUsersService.getFilteredResults(term);
     }
 
     @GetMapping("/filterBySkills")
     private List<SearchFilteredResultDTO> getSkillsFilteredResults(@RequestParam String term){
         return filterUsersService.getSkillsFilteredResult(term);
     }
+
+//    @GetMapping("/filterByPosts")
+//    private List<PostWithCommentsDisLikesAndLikesDTO> getPostsFilteredResults(@RequestParam String term){
+//        return filterUsersService.getPostsFilteredResult(term);
+//    }
 }

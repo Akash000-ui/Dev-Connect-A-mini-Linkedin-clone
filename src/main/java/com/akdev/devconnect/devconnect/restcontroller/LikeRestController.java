@@ -1,10 +1,10 @@
 package com.akdev.devconnect.devconnect.restcontroller;
 
 import com.akdev.devconnect.devconnect.dto.LikesAndDislikes;
-import com.akdev.devconnect.devconnect.dto.LikesDTO;
-import com.akdev.devconnect.devconnect.model.DisLikes;
+import com.akdev.devconnect.devconnect.dto.LikesAndDislikesDTO;
 import com.akdev.devconnect.devconnect.model.Likes;
 import com.akdev.devconnect.devconnect.model.Posts;
+import com.akdev.devconnect.devconnect.model.UsersModel;
 import com.akdev.devconnect.devconnect.repositories.DisLikesRepo;
 import com.akdev.devconnect.devconnect.repositories.LikesRepo;
 import com.akdev.devconnect.devconnect.repositories.PostsRepo;
@@ -37,55 +37,35 @@ public class LikeRestController {
     private PostsRepo postsRepo;
 
     @RequestMapping("/like")
-    public LikesAndDislikes like(@RequestBody LikesDTO likesDTO) {
-        if (dislikesRepo.existsByUser_dislikeAndPost_dislike(likesDTO.getUser_like_id(), likesDTO.getPost_like_id())) {
-            dislikesRepo.deleteByUser_dislikeAndPost_dislike(likesDTO.getUser_like_id(), likesDTO.getPost_like_id());
+    public LikesAndDislikes like(@RequestBody LikesAndDislikesDTO likesAndDislikesDTO) {
+        if (dislikesRepo.existsByUser_dislikeAndPost_dislike(likesAndDislikesDTO.getUser_like_id(), likesAndDislikesDTO.getPost_like_id())) {
+            dislikesRepo.deleteByUser_dislikeAndPost_dislike(likesAndDislikesDTO.getUser_like_id(), likesAndDislikesDTO.getPost_like_id());
         }
 
         LikesAndDislikes likesAndDislikes = new LikesAndDislikes();
 
-        if (likesRepo.existsByUser_likeAndPost_like(likesDTO.getUser_like_id(), likesDTO.getPost_like_id())) {
-            likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesDTO.getPost_like_id()));
-            likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesDTO.getPost_like_id()));
+        if (likesRepo.existsByUser_likeAndPost_like(likesAndDislikesDTO.getUser_like_id(), likesAndDislikesDTO.getPost_like_id())) {
+            likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesAndDislikesDTO.getPost_like_id()));
+            likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesAndDislikesDTO.getPost_like_id()));
         } else {
             Likes likes = new Likes();
-            likes.setUser_like(userRepo.findById(likesDTO.getUser_like_id()).orElse(null));
+            UsersModel usersModel = userRepo.findById(likesAndDislikesDTO.getUser_like_id()).orElse(null);
+            if (usersModel == null) {
+                throw new IllegalArgumentException("User with ID " + likesAndDislikesDTO.getUser_like_id() + " does not exist.");
+            }
+            likes.setUser_like(usersModel);
 
             // Fetch the Post entity and handle null cases
-            Posts post = postsRepo.findById(likesDTO.getPost_like_id()).orElse(null);
+            Posts post = postsRepo.findById(likesAndDislikesDTO.getPost_like_id()).orElse(null);
             if (post == null) {
-                throw new IllegalArgumentException("Post with ID " + likesDTO.getPost_like_id() + " does not exist.");
+                throw new IllegalArgumentException("Post with ID " + likesAndDislikesDTO.getPost_like_id() + " does not exist.");
             }
             likes.setPost_like(post);
 
             likesRepo.save(likes);
-            likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesDTO.getPost_like_id()));
-            likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesDTO.getPost_like_id()));
-        }
-        return likesAndDislikes;
-    }
-
-    /**
-     * This method is used to dislike a post.
-     * @param likesDTO
-     * @return LikesAndDislikes
-     */
-    @RequestMapping("/dislike")
-    public LikesAndDislikes dislike(@RequestBody LikesDTO likesDTO) {
-        if (likesRepo.existsByUser_likeAndPost_like(likesDTO.getUser_like_id(), likesDTO.getPost_like_id())) {
-            likesRepo.deleteByUser_likeAndPost_like(likesDTO.getUser_like_id(), likesDTO.getPost_like_id());
-        }
-        LikesAndDislikes likesAndDislikes = new LikesAndDislikes();
-        if (dislikesRepo.existsByUser_dislikeAndPost_dislike(likesDTO.getUser_like_id(), likesDTO.getPost_like_id())) {
-            likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesDTO.getPost_like_id()));
-            likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesDTO.getPost_like_id()));
-        } else {
-            DisLikes likes = new DisLikes();
-            likes.setUser_dislike(userRepo.findById(likesDTO.getUser_like_id()).orElse(null));
-            likes.setPost_dislike(postsRepo.findById(likesDTO.getPost_like_id()).orElse(null));
-            dislikesRepo.save(likes);
-            likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesDTO.getPost_like_id()));
-            likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesDTO.getPost_like_id()));
+            likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesAndDislikesDTO.getPost_like_id()));
+            likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesAndDislikesDTO.getPost_like_id()));
+            likesAndDislikes.setPostId(likesAndDislikesDTO.getPost_like_id());
         }
         return likesAndDislikes;
     }

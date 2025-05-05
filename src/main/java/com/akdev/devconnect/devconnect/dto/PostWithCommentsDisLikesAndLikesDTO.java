@@ -4,26 +4,44 @@ import java.util.List;
 
 public class PostWithCommentsDisLikesAndLikesDTO {
     private Long postId;
+    private Long userId;
     private String authorName;
     private String title;
     private String content;
     private String imageUrl;
     private Long likesCount;
     private Long dislikesCount;
+    private Long clientId;
     private List<CommentDTO> comments;
 
-    public PostWithCommentsDisLikesAndLikesDTO(Long postId, String title, String content, String imageUrl, Long likesCount, Long dislikesCount, List<CommentDTO> comments) {
+    public PostWithCommentsDisLikesAndLikesDTO(Long userId ,Long postId, String title, String content, String imageUrl, Long likesCount, Long dislikesCount, List<CommentDTO> comments , Long clientId) {
         this.postId = postId;
         this.title = title;
+        this.userId = userId;
         this.content = content;
         this.imageUrl = imageUrl;
         this.likesCount = likesCount;
         this.dislikesCount = dislikesCount;
         this.comments = comments;
+        this.clientId = clientId;
     }
     public PostWithCommentsDisLikesAndLikesDTO() {
     }
 
+    public Long getClientId() {
+        return clientId;
+    }
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
     public Long getPostId() {
         return postId;
     }

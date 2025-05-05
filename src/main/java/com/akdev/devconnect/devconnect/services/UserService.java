@@ -16,15 +16,16 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -41,51 +42,76 @@ public class UserService {
     @Autowired
     private DisLikesRepo dislikesRepo;
 
-    public void addUser(UsersModel user) {
+    public ResponseEntity<Object> addUser(UsersModel user) {
         try {
+            String fileUrl = "http://localhost:2525/" + "default.jpeg";
+            user.setProfileImageUrl(fileUrl);
             userRepo.save(user);
         } catch (Exception e) {
             throw new UserException("Unable to add user: " + e.getMessage());
         }
+        Map<String , Object> response = new HashMap<>();
+        response.put( "status" , HttpStatus.CREATED.value());
+        response.put("message", "User registered successfully");
+        response.put("timestamp", LocalDateTime.now());
+        response.put("user", user);
+
+        return new ResponseEntity<>(response , HttpStatus.CREATED);
     }
 
-    public void isValid(LoginRequest loginRequest, HttpSession session) {
+    @Autowired
+    private JwtService jwtService;
+    public ResponseEntity<Object> isValid(LoginRequest loginRequest) {
 
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         List<UsersModel> users = userRepo.findAll();
         for (UsersModel user : users) {
             if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                session.setAttribute("user", user);
-                return;
+                String token = jwtService.generateToken(user.getName() , user.getEmail() , user);
+                System.out.println("Token generated: " + token);
+                Map<String , Object> response = new HashMap<>();
+                response.put( "status" , HttpStatus.OK.value());
+                response.put("message", "User logged in successfully");
+                response.put("timestamp", LocalDateTime.now());
+                response .put("userId", user.getId());
+                response.put("token", token);
+                response.put("AuthorName", user.getName());
+
+                return new ResponseEntity<>(response , HttpStatus.OK);
             }
         }
         throw new MyLoginException("Invalid email or password");
     }
 
-    public List<PostWithCommentsDisLikesAndLikesDTO> getPosts() {
+    public List<PostWithCommentsDisLikesAndLikesDTO> getPosts(Claims claims) {
         List<Posts> posts = postsRepo.findAll();
         List<PostWithCommentsDisLikesAndLikesDTO> postsWithCLD = new ArrayList<>();
-        for (Posts post : posts) {
-            PostWithCommentsDisLikesAndLikesDTO postWithCLD = new PostWithCommentsDisLikesAndLikesDTO();
-            postWithCLD.setPostId(post.getId());
-            postWithCLD.setTitle(post.getTitle());
-            postWithCLD.setContent(post.getContent());
-            postWithCLD.setImageUrl(post.getImageUrl());
-            postWithCLD.setAuthorName(post.getAuthorName());
+        try {
+            for (Posts post : posts) {
+                PostWithCommentsDisLikesAndLikesDTO postWithCLD = new PostWithCommentsDisLikesAndLikesDTO();
+                postWithCLD.setPostId(post.getId());
+                postWithCLD.setTitle(post.getTitle());
+                postWithCLD.setContent(post.getContent());
+                postWithCLD.setImageUrl(post.getImageUrl());
+                postWithCLD.setAuthorName(post.getAuthorName());
+                postWithCLD.setUserId(post.getAuthor().getId());
+                postWithCLD.setClientId(claims.get("userId", Long.class));
+                Long likesCount = likesRepo.countLikesByPostId(post.getId());
+                Long dislikesCount = dislikesRepo.countDisLikesByPostId(post.getId());
 
-            Long likesCount = likesRepo.countLikesByPostId(post.getId());
-            Long dislikesCount = dislikesRepo.countDisLikesByPostId(post.getId());
+                postWithCLD.setLikesCount(likesCount);
+                postWithCLD.setDislikesCount(dislikesCount);
 
-            postWithCLD.setLikesCount(likesCount);
-            postWithCLD.setDislikesCount(dislikesCount);
+                List<CommentDTO> comments = post.getComments().stream()
+                                .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName()))
+                                .toList();
+                postWithCLD.setComments(comments);
 
-            List<CommentDTO> comments = post.getComments().stream()
-                            .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName()))
-                            .toList();
-            postWithCLD.setComments(comments);
-
-            postsWithCLD.add(postWithCLD);
+                postsWithCLD.add(postWithCLD);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to fetch posts: " + e.getMessage());
         }
 
         return postsWithCLD;
@@ -111,7 +137,7 @@ public class UserService {
                 user.setProfileImageUrl(pictureUrl);
                 user.setBio(bio);
                 user.setSkills(skills);
-                user.setPassword(randomPassword); // Set a random password
+                user.setPassword(randomPassword);
                 userRepo.save(user);
             }
         } catch (Exception e) {
@@ -127,5 +153,38 @@ public class UserService {
 
         GoogleIdToken idToken = verifier.verify(idTokenString);
         return idToken != null ? idToken.getPayload() : null;
+    }
+
+    public ResponseEntity<Object> verifyGoogleUser(Map<String , String> token) {
+        String idTokenString = token.get("id_token");
+        try{
+            GoogleIdToken.Payload payload = verifyToken(idTokenString);
+            if (payload != null) {
+                String email = payload.getEmail();
+                UsersModel user = userRepo.findByEmail(email);
+                if (user != null) {
+                    String token1 = jwtService.generateToken(user.getName() , user.getEmail() , user);
+                    System.out.println("Token generated By Google Auth: " + token1);
+                    Map<String , Object> response = new HashMap<>();
+                    response.put( "status" , HttpStatus.OK.value());
+                    response.put("message", "User logged in successfully");
+                    response.put("timestamp", LocalDateTime.now());
+                    response.put("userId", user.getId());
+                    response.put("token", token1);
+                    response.put("AuthorName", user.getName());
+
+                    return new ResponseEntity<>(response , HttpStatus.OK);
+                } else {
+                    throw new UserException("User not found");
+                }
+            }
+        } catch (Exception e) {
+            throw new UserException("Unable to verify user: " + e.getMessage());
+        }
+        Map<String , Object> response = new HashMap<>();
+        response.put("status", HttpStatus.UNAUTHORIZED.value());
+        response.put("message", "Invalid token");
+        response.put("timestamp", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }
