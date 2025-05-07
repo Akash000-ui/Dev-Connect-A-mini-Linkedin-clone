@@ -65,4 +65,15 @@ public class GlobalException {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(CommentException.class)
+    public ResponseEntity<Object> handleCommentException(CommentException ex , HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Unable to add Comment Error");
+        response.put("message", ex.getMessage());
+        response.put("path", request.getRequestURI());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

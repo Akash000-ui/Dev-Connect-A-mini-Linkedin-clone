@@ -1,8 +1,5 @@
 package com.akdev.devconnect.devconnect.restcontroller;
 
-
-import com.akdev.devconnect.devconnect.dto.PostDTO;
-import com.akdev.devconnect.devconnect.model.Posts;
 import com.akdev.devconnect.devconnect.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
