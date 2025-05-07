@@ -15,7 +15,7 @@ import java.util.Date;
 public class JwtService {
 
     // Fetch secret key from application.properties or environment variable
-    private String secret = "TXlQYXNzd29yZElzQWthc2hSZWRkeTEyM0lBbUZ1Y2tpbmdHcmVhdGVzdE9mQWxsVGltZVlvdUdldEl0UmlnaHQ=";
+    private String secret = "";
 
     // Expiration time in milliseconds (1 day)
     private int expirationTime = 86400000;
