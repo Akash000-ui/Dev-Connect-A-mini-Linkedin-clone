@@ -42,9 +42,15 @@ public class UserRestController {
     }
 
     @RequestMapping("/posts")
-    public List<PostWithCommentsDisLikesAndLikesDTO> getPosts(HttpServletRequest request) {
+    public ResponseEntity<Object> getPosts(HttpServletRequest request) {
         Claims claims = (Claims) request.getAttribute("claims");
-        return userService.getPosts(claims);
+        List<PostWithCommentsDisLikesAndLikesDTO> data = userService.getPosts(claims);
+        Map<String , Object> response = new HashMap<>();
+        response.put("status", HttpStatus.OK.value());
+        response.put("message", "Posts fetched successfully");
+        response.put("timestamp", LocalDateTime.now());
+        response.put("data", data);
+        return new ResponseEntity<>(response , HttpStatus.OK);
     }
 
 

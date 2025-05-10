@@ -22,7 +22,9 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+
         String path = request.getRequestURI();
+        System.out.println("Inside JWT filter for secured path: " + path);
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
@@ -33,8 +35,12 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
 
+        if(path.startsWith("/uploads")){
+            filterChain.doFilter(request, response); // skip JWT check
+            return;
+        }
         // Skip login and register endpoints
-        if (path.equals("/api/v1/user/login/google")|| path.equals("/api/v1/user/login") || path.equals("/api/v1/user/register/google") || path.equals("/api/v1/search/filterByName")|| path.equals("/api/v1/search/filterBySkills")){
+        if (path.equals("/api/v1/user/login/google")|| path.equals("/api/v1/user/login") || path.equals("/api/v1/user/register/google") || path.equals("/api/v1/user/register")) {
             System.out.println("Skipping JWT filter for path: " + path);
             filterChain.doFilter(request, response); // skip JWT check
             return;
@@ -66,5 +72,4 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("Continuing with request processing");
         filterChain.doFilter(request, response); // continue with the request
     }
-
 }

@@ -118,6 +118,54 @@ public class UserService {
 
     }
 
+    public List<PostWithCommentsDisLikesAndLikesDTO> getPostByUserId(Long userId){
+        System.out.println("______________________________________________________");
+        System.out.println("Inside getPostByUserId");
+        System.out.println("UserId: " + userId);
+        System.out.println("______________________________________________________");
+
+        List<Posts> posts = postsRepo.findAllByUserId(userId);
+        for (Posts post : posts) {
+            System.out.println("Post ID: " + post.getId());
+            System.out.println("Post Title: " + post.getTitle());
+            System.out.println("Post Content: " + post.getContent());
+            System.out.println("Post Image URL: " + post.getImageUrl());
+            System.out.println("Post Author Name: " + post.getAuthorName());
+            System.out.println("______________________________________________________");
+        }
+        System.out.println("Posts: " + posts);
+        System.out.println("______________________________________________________");
+        List<PostWithCommentsDisLikesAndLikesDTO> postsWithCLD = new ArrayList<>();
+        try {
+            for (Posts post : posts) {
+                PostWithCommentsDisLikesAndLikesDTO postWithCLD = new PostWithCommentsDisLikesAndLikesDTO();
+                postWithCLD.setPostId(post.getId());
+                postWithCLD.setTitle(post.getTitle());
+                postWithCLD.setContent(post.getContent());
+                postWithCLD.setImageUrl(post.getImageUrl());
+                postWithCLD.setAuthorName(post.getAuthorName());
+                postWithCLD.setUserId(post.getAuthor().getId());
+
+                Long likesCount = likesRepo.countLikesByPostId(post.getId());
+                Long dislikesCount = dislikesRepo.countDisLikesByPostId(post.getId());
+
+                postWithCLD.setLikesCount(likesCount);
+                postWithCLD.setDislikesCount(dislikesCount);
+
+                List<CommentDTO> comments = post.getComments().stream()
+                        .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName()))
+                        .toList();
+                postWithCLD.setComments(comments);
+
+                postsWithCLD.add(postWithCLD);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to fetch posts: " + e.getMessage());
+        }
+
+        return postsWithCLD;
+    }
+
 
     public void registerUserWithGoogle(OAuthRegisterDTO oAuthRegisterDTO) {
 

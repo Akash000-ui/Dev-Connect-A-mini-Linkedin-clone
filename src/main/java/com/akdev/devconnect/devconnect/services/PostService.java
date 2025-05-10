@@ -53,7 +53,7 @@ public class PostService {
             newPost.setTitle(title);
             newPost.setContent(content);
             // Set the image URL to be accessible via HTTP
-            newPost.setImageUrl("http://localhost:2525/" + fileName);
+            newPost.setImageUrl("http://localhost:2525/uploads/" + fileName);
             newPost.setAuthorName(authorName);
             Long id = Long.parseLong(authorId);
             newPost.setAuthor(userRepo.findById(id).orElseThrow(() -> new PostsException("User not found")));
