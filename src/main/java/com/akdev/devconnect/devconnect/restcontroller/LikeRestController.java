@@ -36,6 +36,9 @@ public class LikeRestController {
     @Autowired
     private PostsRepo postsRepo;
 
+    @Autowired
+    private NotificationRestController notificationRestController;
+
     @RequestMapping("/like")
     public LikesAndDislikes like(@RequestBody LikesAndDislikesDTO likesAndDislikesDTO) {
         if (dislikesRepo.existsByUser_dislikeAndPost_dislike(likesAndDislikesDTO.getUser_like_id(), likesAndDislikesDTO.getPost_like_id())) {
@@ -66,6 +69,15 @@ public class LikeRestController {
             likesAndDislikes.setLikesCount(likesRepo.countLikesByPostId(likesAndDislikesDTO.getPost_like_id()));
             likesAndDislikes.setDislikesCount(dislikesRepo.countDisLikesByPostId(likesAndDislikesDTO.getPost_like_id()));
             likesAndDislikes.setPostId(likesAndDislikesDTO.getPost_like_id());
+
+            // Send notification
+
+            System.out.println("Sending notification to the user");
+            System.out.println("User ID: " + usersModel.getId());
+            System.out.println("Post Author ID: " + post.getAuthor().getId());
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            notificationRestController.sendMessage(usersModel.getId(), post.getAuthor().getId(), likesAndDislikesDTO.getPost_like_id() ,"Your post has been liked by " + usersModel.getName());
+            System.out.println("Notification sent successfully 🙌🙌🙌🙌");
         }
         return likesAndDislikes;
     }

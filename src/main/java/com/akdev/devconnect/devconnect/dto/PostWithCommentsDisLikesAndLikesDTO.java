@@ -5,6 +5,7 @@ import java.util.List;
 public class PostWithCommentsDisLikesAndLikesDTO {
     private Long postId;
     private Long userId;
+    private String profileImageUrl;
     private String authorName;
     private String title;
     private String content;
@@ -14,7 +15,7 @@ public class PostWithCommentsDisLikesAndLikesDTO {
     private Long clientId;
     private List<CommentDTO> comments;
 
-    public PostWithCommentsDisLikesAndLikesDTO(Long userId ,Long postId, String title, String content, String imageUrl, Long likesCount, Long dislikesCount, List<CommentDTO> comments , Long clientId) {
+    public PostWithCommentsDisLikesAndLikesDTO(Long userId ,Long postId, String title, String content, String imageUrl, Long likesCount, Long dislikesCount, List<CommentDTO> comments , Long clientId , String profileImageUrl) {
         this.postId = postId;
         this.title = title;
         this.userId = userId;
@@ -24,6 +25,7 @@ public class PostWithCommentsDisLikesAndLikesDTO {
         this.dislikesCount = dislikesCount;
         this.comments = comments;
         this.clientId = clientId;
+        this.profileImageUrl = profileImageUrl;
     }
     public PostWithCommentsDisLikesAndLikesDTO() {
     }
@@ -104,5 +106,12 @@ public class PostWithCommentsDisLikesAndLikesDTO {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

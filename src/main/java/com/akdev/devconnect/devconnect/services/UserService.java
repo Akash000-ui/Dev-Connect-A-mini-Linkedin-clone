@@ -44,7 +44,7 @@ public class UserService {
 
     public ResponseEntity<Object> addUser(UsersModel user) {
         try {
-            String fileUrl = "http://localhost:2525/" + "default.jpeg";
+            String fileUrl = "http://localhost:2525/uploads/" + "default.jpeg";
             user.setProfileImageUrl(fileUrl);
             userRepo.save(user);
         } catch (Exception e) {
@@ -95,6 +95,7 @@ public class UserService {
                 postWithCLD.setContent(post.getContent());
                 postWithCLD.setImageUrl(post.getImageUrl());
                 postWithCLD.setAuthorName(post.getAuthorName());
+                postWithCLD.setProfileImageUrl(post.getAuthor().getProfileImageUrl());
                 postWithCLD.setUserId(post.getAuthor().getId());
                 postWithCLD.setClientId(claims.get("userId", Long.class));
                 Long likesCount = likesRepo.countLikesByPostId(post.getId());
@@ -104,7 +105,7 @@ public class UserService {
                 postWithCLD.setDislikesCount(dislikesCount);
 
                 List<CommentDTO> comments = post.getComments().stream()
-                                .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName()))
+                                .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName() , comments1.getComment_user().getProfileImageUrl() , comments1.getComment_user().getId()))
                                 .toList();
                 postWithCLD.setComments(comments);
 
@@ -153,7 +154,7 @@ public class UserService {
                 postWithCLD.setDislikesCount(dislikesCount);
 
                 List<CommentDTO> comments = post.getComments().stream()
-                        .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName()))
+                        .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName() , comments1.getComment_user().getProfileImageUrl() , comments1.getComment_user().getId()))
                         .toList();
                 postWithCLD.setComments(comments);
 

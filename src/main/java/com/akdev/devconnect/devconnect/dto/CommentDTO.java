@@ -2,13 +2,17 @@ package com.akdev.devconnect.devconnect.dto;
 
 public class CommentDTO {
     private Long commentId;
+    private Long userId;
     private String content;
     private String author;
+    private String profileImageUrl;
 
-    public CommentDTO(Long commentId, String content, String author) {
+    public CommentDTO(Long commentId, String content, String author , String profileImageUrl , Long userId) {
         this.commentId = commentId;
         this.content = content;
         this.author = author;
+        this.profileImageUrl = profileImageUrl;
+        this.userId = userId;
     }
     public CommentDTO() {
     }
@@ -36,4 +40,18 @@ public class CommentDTO {
     public void setAuthor(String author) {
         this.author = author;
     }
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+
+    }
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
 }

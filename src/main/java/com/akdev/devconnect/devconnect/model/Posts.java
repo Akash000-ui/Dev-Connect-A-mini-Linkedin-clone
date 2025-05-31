@@ -29,6 +29,9 @@ public class Posts {
     @OneToMany(mappedBy = "post_dislike", cascade = CascadeType.ALL)
     List<DisLikes> dislikes;
 
+    @OneToMany(mappedBy = "postNotification", cascade = CascadeType.ALL)
+    private List<Notification> notifications;
+
     public List<Likes> getLikes() {
         return likes;
     }

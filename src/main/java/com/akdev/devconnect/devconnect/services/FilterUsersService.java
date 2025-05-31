@@ -58,6 +58,7 @@ public class FilterUsersService {
                 postWithCLD.setImageUrl(post.getImageUrl());
                 postWithCLD.setAuthorName(post.getAuthorName());
                 postWithCLD.setUserId(post.getAuthor().getId());
+                postWithCLD.setProfileImageUrl(post.getAuthor().getProfileImageUrl());
                 //postWithCLD.setClientId(claims.get("userId", Long.class));
                 Long likesCount = likesRepo.countLikesByPostId(post.getId());
                 Long dislikesCount = dislikesRepo.countDisLikesByPostId(post.getId());
@@ -66,7 +67,7 @@ public class FilterUsersService {
                 postWithCLD.setDislikesCount(dislikesCount);
 
                 List<CommentDTO> comments = post.getComments().stream()
-                        .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName()))
+                        .map(comments1 -> new CommentDTO(comments1.getId() , comments1.getContent() , comments1.getAuthorName() , comments1.getComment_user().getProfileImageUrl() , comments1.getComment_user().getId()))
                         .toList();
                 postWithCLD.setComments(comments);
 

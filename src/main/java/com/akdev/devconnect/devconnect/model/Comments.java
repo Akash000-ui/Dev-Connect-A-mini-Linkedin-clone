@@ -20,6 +20,9 @@ public class Comments {
     @JoinColumn(name = "post_id")
     private Posts post_comment;
 
+    private Long comment_user_id;
+    private Long post_comment_id;
+
     public Long getId() {
         return id;
     }
@@ -58,5 +61,22 @@ public class Comments {
 
     public void setPost_comment(Posts post_comment) {
         this.post_comment = post_comment;
+    }
+
+
+    public Long getComment_user_id() {
+        return comment_user_id;
+    }
+
+    public void setComment_user_id(Long comment_user_id) {
+        this.comment_user_id = comment_user_id;
+    }
+
+    public Long getPost_comment_id() {
+        return post_comment_id;
+    }
+
+    public void setPost_comment_id(Long post_comment_id) {
+        this.post_comment_id = post_comment_id;
     }
 }

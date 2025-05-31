@@ -40,7 +40,10 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         // Skip login and register endpoints
-        if (path.equals("/api/v1/user/login/google")|| path.equals("/api/v1/user/login") || path.equals("/api/v1/user/register/google") || path.equals("/api/v1/user/register")) {
+        if (path.equals("/api/v1/user/login/google")|| path.equals("/api/v1/user/login")
+                || path.equals("/api/v1/user/register/google")
+                || path.equals("/api/v1/user/register")||
+         path.startsWith("/ws") ) {
             System.out.println("Skipping JWT filter for path: " + path);
             filterChain.doFilter(request, response); // skip JWT check
             return;
